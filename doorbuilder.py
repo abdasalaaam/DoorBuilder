@@ -12,8 +12,17 @@ import atexit
 
 options = Options()
 options.add_argument("--headless")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--no-sandbox")
+options.add_argument('--disable-gpu')
+options.add_experimental_option("detach", True)
+chrome_prefs = {}
+options.experimental_options["prefs"] = chrome_prefs
+chrome_prefs["profile.default_content_settings"] = {"images": 2}
 desired_capabilities = DesiredCapabilities.CHROME.copy()
 desired_capabilities['acceptInsecureCerts'] = True 
+
+
 driver = ''
 
 types = ['raised', 'stamped carriage', 'shaker', 'sterling', 'planks', 'skyline', 'shoreline', 'overlay', 'full', 'recessed']
@@ -51,6 +60,7 @@ cardlink = ''
 
 class DoorBuilder:
     cardlink = ''
+    unavailable = False
     def __init__(self, driver):
         self.driver = driver
 
@@ -136,6 +146,14 @@ class DoorBuilder:
                 self.driver.close()
         self.driver.switch_to.window(keep_open)
         self.driver.get('https://doorvisions.chiohd.com/')
+
+    def hardResetDriver(self):
+        self.driver.quit()
+        self.driver = startDriver()
+
+    def setUnavailable(self, val):
+        self.unavailable = val
+
 
 def waitForElement(element, by, driver,time = 22):
     try:
@@ -487,40 +505,11 @@ def loadURLs():
         print("pickle file does not exist")
         return {}
 
-cached_urls = loadURLs()
+cached_urls = {}
 atexit.register(saveURLs)
 
 #startDriver()
 #print(build('16x7 noninsulated white raised long panel sunburst tinted windows'))
+#d = DoorBuilder(startDriver())
+#print(d.build('16x7 noninsulated white raised long panel sunburst tinted windows'))
 
-
-#potential use:
-
-def waitForClassElement(clas, text, driver, time = 10):
-    try:       
-        findAndWaitElementWithText(clas,text,driver,time)
-        return 0
-    except:
-        try:
-            #wait = WebDriverWait(driver,8)
-            #img = wait.until(ec.visibility_of_element_located((By.CLASS_NAME, 'modal-body')))
-            for i in driver.find_elements(By.CLASS_NAME, 'modal-body'):
-                if i.is_displayed():
-                    return i.text
-            return 1
-        except:
-            return 1
-
-def findAndWaitElementWithText(clas, texts, driver, t = 10, k = 0):
-    wait = WebDriverWait(driver,t)
-    eles = driver.find_elements(By.CLASS_NAME, clas)
-    for i in eles:
-        for text in texts:
-            if text.lower() in i.text.lower():
-                wait.until(ec.visibility_of(i))
-                time.sleep(.5)
-                return True
-    if k < 100:
-        time.sleep(0.1)
-        return findAndWaitElementWithText(clas,text,driver,k= k + 1)
-    raise Exception('Could not find element')
