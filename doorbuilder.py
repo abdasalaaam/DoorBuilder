@@ -151,6 +151,9 @@ class DoorBuilder:
         self.driver.quit()
         self.driver = startDriver()
 
+    def endDriver(self):
+        self.driver.quit()
+
     def setUnavailable(self, val):
         self.unavailable = val
 

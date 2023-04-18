@@ -6,6 +6,7 @@ from flask import Flask, request
 import requests
 from twilio.twiml.messaging_response import MessagingResponse
 import time
+import atexit
 
 from config import TWILIO
 import doorbuilder
@@ -101,6 +102,13 @@ def send_response(response, number):
         to=number
     )
 
+def closeAllDrivers():
+    while not builder_queue.empty():
+        b = builder_queue.get()
+        if b == None:
+            continue
+        b.endDriver()
+
 @application.route("/bot", methods=['GET', 'POST'])
 def bot():
     user_msg = request.values.get('Body')
@@ -122,6 +130,7 @@ def on_start():
     print('Ben is lovely')
     threading.Thread(target=initialize_builders, args=(num_builders,)).start()
     
+atexit.register(closeAllDrivers)
 
 if __name__ == "__main__":
     application.run(host='0.0.0.0', port=80)
