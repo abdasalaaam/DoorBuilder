@@ -76,14 +76,18 @@ def handle_message(user_msg, to_number):
 
     for b in unavalBuilders:
         builder_queue.put(b)
-   
+
     try:
         url = builder.build(user_msg)
         send_response(url, to_number)
         builder.resetDriver()
     except:
-        send_response('Please try again in a few minutes', to_number)
-        builder.setUnavailable(True)
+        if builder == None:
+            send_response('Please try again in a few seconds', to_number)
+            return
+        else:
+            send_response('Builder error, please try again in a few minutes', to_number)
+            builder.setUnavailable(True)
 
     with builder_lock:
         builder_queue.put(builder)
