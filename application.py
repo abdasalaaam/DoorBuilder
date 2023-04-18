@@ -120,7 +120,7 @@ def home():
 def on_start():
     num_builders = 2
     print('Ben is lovely')
-    threading.Thread(target=initialize_builders, args=(num_builders)).start()
+    threading.Thread(target=initialize_builders, args=(num_builders,)).start()
     
 
 if __name__ == "__main__":
