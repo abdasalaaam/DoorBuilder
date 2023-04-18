@@ -49,6 +49,7 @@ def initialize_builders(num_builders):
         reset_thread = threading.Thread(target=reset_builder, args=(builder, reset_intervals[i % len(reset_intervals)]))
         reset_thread.daemon = True
         reset_thread.start()
+        send_response('Initialized Builder!', '+14406507000')
 
 def handle_message(user_msg, to_number):
     if 'help' in user_msg.lower():
@@ -119,8 +120,8 @@ def home():
 def on_start():
     num_builders = 2
     print('Ben is lovely')
-    initialize_builders(num_builders)
-    send_response('Server started!', '+14406507000')
+    threading.Thread(target=initialize_builders, args=(num_builders)).start()
+    
 
 if __name__ == "__main__":
     application.run(host='0.0.0.0', port=80)
