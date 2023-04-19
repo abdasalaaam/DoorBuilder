@@ -61,35 +61,30 @@ def handle_message(user_msg, to_number):
         return
 
     builder = None
-    unavalBuilders = []
 
     while builder is None:
         with builder_lock:
             if not builder_queue.empty():
                 builder = builder_queue.get()
-                if builder.unavailable == True:
-                    unavalBuilders.append(builder)
-                    builder = None
                 print(f"Assigned builder: {builder}")
             else:
                 print("No available builders")
                 break
         time.sleep(1)
 
-    for b in unavalBuilders:
-        builder_queue.put(b)
-
     try:
         url = builder.build(user_msg)
         send_response(url, to_number)
         builder.resetDriver()
-    except:
+    except Exception as e:
+        print(f'Failure in selecting builder: {e}')
         if builder == None:
             send_response('Please try again in a few seconds', to_number)
             return
         else:
-            send_response('Builder error, please try again in a few minutes', to_number)
-            builder.setUnavailable(True)
+            send_response('Builder error, please try again in 30 seconds', to_number)
+            print('reseting driver')
+            builder.hardResetDriver()
 
     with builder_lock:
         builder_queue.put(builder)
