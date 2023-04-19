@@ -35,7 +35,7 @@ inserts = ['no inserts', 'cascade', 'prairie', 'sherwood', 'waterton', 'stockton
  'sunburst', 'cathedral', '2 piece arched madison', 'arched madison', 'madison']
 
 glasses = ['clear','aluminum','plain stockton', 'plain madison', 'plain','tinted stockton','tinted madison',
-'tinted','glue chip madison', 'glue chip stockton','seeded madison', 'seeded stockton', 'glue chip', 'frosted', 'polycarbonate', 'obscure', 'seeded', 'faux stockton' , 'faux madison', 'faux', 'double pane']
+'tinted','glue chip madison', 'glue chip stockton','seeded madison', 'seeded stockton', 'glue chip', 'frosted', 'polycarbonate', 'obscure', 'seeded', 'faux stockton' , 'faux madison', 'faux', 'double pane' , 'laminate']
 
 windowRows = ['no windows', 'first', 'second','top 2', 'top','all', 'left', 'right', 'double', 'bottom 2', 'bottom']
 
@@ -441,6 +441,7 @@ def getDoorFromText(response):
     if glass == 'double pane':
         glass = 'insulated'
     type = findSpecFromCategory(types, response.lower())
+    wind = findSpecFromCategory(windowRows, response.lower())
     return {
         'width' : size['width'],
         'height' : size['height'],
@@ -451,7 +452,7 @@ def getDoorFromText(response):
         'style' : findSpecFromCategory(styles, response.lower()) or [''],
         'thermal' : findSpecFromCategory(models,response.lower()) or determineInsulation(response.lower()) or ['r-n'],
         'color' : findSpecFromCategory(colors, response.lower()) or ['white'],
-        'windows' : findSpecFromCategory(windowRows, response.lower()) or (['no windows'] if glass == '' and insert == '' else ['first', 'single', 'top', 'full']),
+        'windows' : 'frosted' if wind == 'laminate' else (wind or (['no windows'] if glass == '' and insert == '' else ['first', 'single', 'top', 'full'])),
         'glass' : glass or (['tinted'] if type == 'sterling' else ['plain','clear']),
         'inserts' : insert or ['no inserts'],
         'decor' : findSpecFromCategory(hardware, response.lower()) or ['omit']
@@ -532,6 +533,6 @@ atexit.register(saveURLs)
 
 #startDriver()
 #print(build('16x7 noninsulated white raised long panel sunburst tinted windows'))
-d = DoorBuilder(startDriver())
-print(d.build('8x8 long panel aluminum door with white laminate glass'))
+#d = DoorBuilder(startDriver())
+#print(d.build('16x8 full view clear windows'))
 
