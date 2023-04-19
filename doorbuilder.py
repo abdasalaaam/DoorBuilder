@@ -229,12 +229,15 @@ def fillDimensions(tags, door, driver):
     clearAndSend(getElement(By.ID, tags[1], driver),door['winches'])
     clearAndSend(getElement(By.ID, tags[2], driver),door['height'])
     clearAndSend(getElement(By.ID, tags[3], driver),door['hinches'])
-    findElementLookingFor('btn-primary','confirm size', driver).click()
+    ele = findElementLookingFor('btn-primary','confirm size', driver)
+    clickElement(driver, ele)
 
 def completeAndReturnPDF(driver, door):
-    findElementLookingFor('overflow-ellipsis', 'summary', driver).click()
+    ele = findElementLookingFor('overflow-ellipsis', 'summary', driver)
+    clickElement(driver, ele)
     time.sleep(.3)
-    findElementLookingFor('btn-primary', 'download', driver).click()
+    ele = findElementLookingFor('btn-primary', 'download', driver)
+    clickElement(driver, ele)
     switchToNewTab(driver)
     print('switched to new tab')
     if not waitForElement('pageContent', By.CLASS_NAME, driver):
@@ -256,6 +259,9 @@ def convertDoorToString(door):
         s += str(door[i])
     return s
 
+def clickElement(driver, ele):
+    driver.execute_script("arguments[0].click();", ele)
+
 def fullBuild(builder, door, tags, driver):
     w = waitForElement(tags['dimWait'], By.ID,driver)
     if not w:
@@ -267,7 +273,8 @@ def fullBuild(builder, door, tags, driver):
     w = builder.waitForCardLinkToChange(driver)
     if not w:
         try:
-            findButtonForSpec(door['type'], 'card-link',driver).click()
+            ele = findButtonForSpec(door['type'], 'card-link',driver)
+            clickElement(driver, ele)
         except Exception as e:
             print(door['type'])
             print(f'Exception in finding door product button:\n {e}')
@@ -279,7 +286,8 @@ def fullBuild(builder, door, tags, driver):
         builder.waitForCardLinkToChange(driver)
         if not w:
             try:
-                findButtonForSpec(door['style'], 'card-link', driver).click()
+                ele = findButtonForSpec(door['style'], 'card-link', driver)
+                clickElement(driver, ele)
             except Exception as e:
                 print(door['style'])
                 print(f'Exception in finding door product button:\n {e}')
@@ -289,7 +297,8 @@ def fullBuild(builder, door, tags, driver):
     w = builder.waitForCardLinkToChange(driver)
     if not w:
         try:
-            findButtonForSpec(door['design'], 'card-link', driver).click()
+            ele = findButtonForSpec(door['design'], 'card-link', driver)
+            clickElement(driver, ele)
         except Exception as e:
             print(door['design'])
             print(f'Exception in finding door design button:\n {e}')
@@ -311,16 +320,17 @@ def fullBuild(builder, door, tags, driver):
         col = findButtonForSpec(door['color'], 'card-link', getElement(By.ID,'items-collapser-Solid Colors', driver))
         if col:
             print('found button')
-            col.click()
+            clickElement(driver, col)
             print('button clicked')
         else:
             print('wrong button')
             try:
-                getElement(By.ID,tags['col2Wait'], driver).click()
+                ele = getElement(By.ID,tags['col2Wait'], driver)
+                clickElement(driver, ele)
                 col = findButtonForSpec(door['color'], 'card-link', driver)
                 if not col:
                     return 'Failure in door color selection'
-                col.click() 
+                clickElement(driver, col)
             except Exception as e:
                 print(door['color'])
                 print(f'Exception in finding door color button:\n {e}')
@@ -334,13 +344,16 @@ def fullBuild(builder, door, tags, driver):
     print('windows appeared')
     if not w:
         try:
-            findButtonForSpec(door['windows'], 'card-link', getElement(By.ID, 'items-collapser-Position', driver)).click()
+            ele = findButtonForSpec(door['windows'], 'card-link', getElement(By.ID, 'items-collapser-Position', driver))
+            clickElement(driver, ele)
             print('selected window')
             if not door['windows'][0].__contains__('no'):
-                findButtonForSpec(door['glass'], 'card-link', getElement(By.ID, 'items-collapser-Glass', driver)).click()
+                ele = findButtonForSpec(door['glass'], 'card-link', getElement(By.ID, 'items-collapser-Glass', driver))
+                clickElement(driver, ele)
                 print('selected glass')
                 if not (door['type'][0] == 'sterling' or door['type'][0] == 'full'):
-                    findButtonForSpec(door['inserts'], 'card-link', getElement(By.ID, 'items-collapser-Window Inserts', driver)).click()
+                    ele = findButtonForSpec(door['inserts'], 'card-link', getElement(By.ID, 'items-collapser-Window Inserts', driver))
+                    clickElement(driver, ele)
                     print('selected inserts')
         except Exception as e:
             print(door['windows'], door['glass'], door['inserts'])
@@ -353,7 +366,8 @@ def fullBuild(builder, door, tags, driver):
         w = builder.waitForCardLinkToChange(driver,5)
         if not w:
             try:
-                findButtonForSpec(door['decor'], 'card-link', driver).click()
+                ele = findButtonForSpec(door['decor'], 'card-link', driver)
+                clickElement(driver, ele)
             except Exception as e:
                 print(door['decor'])
                 print(f'Exception in finding hardware button:\n {e}')
@@ -368,7 +382,8 @@ def chooseInsulation(builder,door, driver):
     if not w:
         if not door['thermal'][0][0] == 'r':
             try:
-                findButtonForSpec(door['thermal'], 'card-link', getElement(By.ID, 'items-collapser-Thermal Requirements / Construction', driver)).click()
+                ele = findButtonForSpec(door['thermal'], 'card-link', getElement(By.ID, 'items-collapser-Thermal Requirements / Construction', driver))
+                clickElement(driver, ele)
             except Exception as e:
                 print(door['thermal'])
                 print(f'Exception in finding insulation button:\n {e}')
@@ -392,7 +407,8 @@ def chooseInsulation(builder,door, driver):
                 if breakloop == True:
                         break
             try:
-                findButtonForSpec([model], 'card-link', getElement(By.ID, 'items-collapser-Thermal Requirements / Construction', driver)).click()
+                ele = findButtonForSpec([model], 'card-link', getElement(By.ID, 'items-collapser-Thermal Requirements / Construction', driver))
+                clickElement(driver, ele)
             except Exception as e:
                 print(door['thermal'])
                 print(f'Exception in finding insulation button:\n {e}')
@@ -447,7 +463,7 @@ def getDoorFromText(response):
         'height' : size['height'],
         'winches' : size['winches'],
         'hinches' : size['hinches'],
-        'type' : 'full' if type == 'aluminum' else 'overlay' if type == 'wood ' else (type or ['raised']),
+        'type' : 'overlay' if type == 'wood ' else (type or ['raised']),
         'design' : findSpecFromCategory(designs, response.lower()) or ['short'],
         'style' : findSpecFromCategory(styles, response.lower()) or [''],
         'thermal' : findSpecFromCategory(models,response.lower()) or determineInsulation(response.lower()) or ['r-n'],
@@ -528,11 +544,11 @@ def loadURLs():
         print("pickle file does not exist")
         return {}
 
-cached_urls = {}
+cached_urls = loadURLs()
 atexit.register(saveURLs)
 
 #startDriver()
 #print(build('16x7 noninsulated white raised long panel sunburst tinted windows'))
-#d = DoorBuilder(startDriver())
-#print(d.build('16x8 full view clear windows'))
+d = DoorBuilder(startDriver())
+print(d.build('8x8 full view aluminum door white laminate glass'))
 
